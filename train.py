@@ -302,6 +302,21 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
 
             # Print
             if rank in [-1, 0]:
+                # print("loss items: ",loss_items)
+                # Define the keys
+                keys = ['box', 'obj', 'cls', 'total']
+
+                # Convert tensor to dictionary
+                result_dict = dict(zip(keys, loss_items.cpu().numpy().tolist()))
+
+                # Print the resulting dictionary
+                # print(result_dict)
+                '''
+                core_context.train.report_training_metrics(
+                steps_completed=ni, 
+                metrics=result_dict
+                )
+                '''
                 mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
                 mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
                 s = ('%10s' * 2 + '%10.4g' * 6) % (

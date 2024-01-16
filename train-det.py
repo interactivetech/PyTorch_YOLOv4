@@ -311,19 +311,20 @@ def train(hyp,
 
             # Print
             if rank in [-1, 0]:
-                keys = ['box_loss', 'obj_loss', 'cls_loss', 'total_loss']
+                if ni%1000==0:
+                    keys = ['box_loss', 'obj_loss', 'cls_loss', 'total_loss']
 
-                # Convert tensor to dictionary
-                result_dict = dict(zip(keys, loss_items.cpu().numpy().tolist()))
+                    # Convert tensor to dictionary
+                    result_dict = dict(zip(keys, loss_items.cpu().numpy().tolist()))
 
-                # Print the resulting dictionary
-                print(result_dict)
-                
-                core_context.train.report_training_metrics(
-                steps_completed=ni, 
-                metrics=result_dict
-                )
-                print("Metrics Saved!")
+                    # Print the resulting dictionary
+                    print(result_dict)
+                    
+                    core_context.train.report_training_metrics(
+                    steps_completed=ni, 
+                    metrics=result_dict
+                    )
+                    print("Metrics Saved!")
                 mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
                 mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
                 s = ('%10s' * 2 + '%10.4g' * 6) % (

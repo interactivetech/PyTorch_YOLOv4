@@ -347,6 +347,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 ema.update_attr(model)
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
+                # Andrew(1.16.23) Why does this codebase do this?
                 if epoch >= 3:
                     results, maps, times = test.test(opt.data,
                                                  batch_size=batch_size*2,

@@ -334,7 +334,7 @@ def train(hyp,
                 # Plot
                 if plots and ni < 3:
                     f = save_dir / f'train_batch{ni}.jpg'  # filename
-                    plot_images(images=imgs, targets=targets, paths=paths, fname=f)
+                    plot_images(images=imgs, targets=targets, paths=paths, fname=f,names=model.names)
                     # if tb_writer:
                     #     tb_writer.add_image(f, result, dataformats='HWC', global_step=epoch)
                     #     tb_writer.add_graph(model, imgs)  # add model to tensorboard
@@ -355,7 +355,7 @@ def train(hyp,
                 ema.update_attr(model)
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
-                if epoch >= 3:
+                if epoch >= 0:
                     results, maps, times = test.test(opt.data,
                                                  batch_size=batch_size*2,
                                                  imgsz=imgsz_test,
@@ -393,11 +393,19 @@ def train(hyp,
                 if tag in ['metrics/precision', 'metrics/recall', 'metrics/mAP_0.5', 'metrics/mAP_0.5:0.95','val/box_loss', 'val/obj_loss', 'val/cls_loss']:
                     print(f"{tag}: ",x)
                     if torch.is_tensor(x):
-                        train_res_dict[tag]=x.item()
+                        val_res_dict[tag]=x.item()
                     else:
                         train_res_dict[tag]=x
             print("train_res_dict: ",train_res_dict)
             print("val_res_dict: ",val_res_dict)
+            core_context.train.report_training_metrics(
+                    steps_completed=epoch, 
+                    metrics=train_res_dict
+                    )
+            core_context.train.report_validation_metrics(
+                    steps_completed=epoch, 
+                    metrics=val_res_dict
+                    )
             # Update best mAP
             fi = fitness(np.array(results).reshape(1, -1))  # weighted combination of [P, R, mAP@.5, mAP@.5-.95]
             fi_p = fitness_p(np.array(results).reshape(1, -1))  # weighted combination of [P, R, mAP@.5, mAP@.5-.95]

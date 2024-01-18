@@ -1,0 +1,43 @@
+name: NorthPole Finetuning Test
+workspace: Andrew
+project: NorthPole
+entrypoint: >-
+  python3 train-det.py 
+  --device 0 
+  --batch-size 8 
+  --epochs 10 
+  --img 640 640 
+  --data /nvmefs1/andrew.mendez/virat-aerial-156-frames-v2-coco-yolov5/data.yml 
+  --cfg cfg/yolov4-pacsp-fmv.cfg 
+  --weights '' 
+  --name /nvmefs1/andrew.mendez/yolov4_train_runs/fmv_train_exp 
+  --exist-ok
+bind_mounts:
+  - container_path: /run/determined/coco
+    host_path: /home/andrew/coco
+  - container_path: /yolo
+    host_path: /home/andrew/PyTorch_YOLOv4
+  - container_path: /nvmefs1/
+    host_path: /nvmefs1/
+resources:
+  slots_per_trial: 1
+  resource_pool: A100
+environment:
+  image: mendeza/yolov4-env:0.0.2
+searcher:
+   name: single
+   metric: test_loss
+   max_length: 1
+   
+hyperparameters:
+   epochs: 5
+   batch_size: 64
+   test_batch_size: 1000
+   learning_rate: 0.0001
+   gamma: 0.7
+   n_filters1: 8
+   n_filters2: 8
+   dropout1: 0.2
+   dropout2: 0.2
+
+max_restarts: 0

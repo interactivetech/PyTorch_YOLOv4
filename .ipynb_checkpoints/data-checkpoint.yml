@@ -1,4 +1,0 @@
-names: [vehicle, person]
-nc: 2
-train: /nvmefs1/andrew.mendez/virat-aerial-156-frames-v2-coco-yolov5/train
-val: /nvmefs1/andrew.mendez/virat-aerial-156-frames-v2-coco-yolov5/val

@@ -7,10 +7,10 @@ entrypoint: >-
   --batch-size 8 
   --epochs 10 
   --img 640 640 
-  --data /nvmefs1/andrew.mendez/virat-aerial-156-frames-v2-coco-yolov5/data.yml 
+  --data /nvmefs1/andrew.mendez/virat-aerial-156-frames-v2-coco-yolov5-subset/data.yml 
   --cfg cfg/yolov4-pacsp-fmv.cfg 
   --weights '/nvmefs1/andrew.mendez/fmv_yolov4_pretrained_weights/best.pt' 
-  --name /nvmefs1/andrew.mendez/yolov4_train_runs/fmv_train_exp 
+  --name /nvmefs1/andrew.mendez/yolov4_train_runs/fmv_train_subset_exp 
   --exist-ok
 bind_mounts:
   - container_path: /run/determined/coco

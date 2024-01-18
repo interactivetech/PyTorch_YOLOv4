@@ -1,0 +1,37 @@
+pipeline:
+    name: 'train'
+description: 'Extract content in xml files to a csv file'
+input:
+    cross:
+        - pfs: 
+            repo: 'data'
+            branch: 'master'
+            glob: '/'
+transform:
+    image: mendeza/yolov4-env:0.0.2
+    cmd: 
+        - '/bin/sh'
+    stdin: 
+        - 'pip install determined==0.26.1'
+        - 'python /pfs/code/src/py/train-det-runner.py'
+        - 'echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt'
+    secrets:
+        - name: pipeline-secret
+          key: det_master
+          env_var: DET_MASTER
+        - name: pipeline-secret
+          key: det_user
+          env_var: DET_USER
+        - name: pipeline-secret
+          key: det_password
+          env_var: DET_PASSWORD
+        - name: pipeline-secret
+          key: pac_token
+          env_var: PAC_TOKEN
+autoscaling: False
+pod_patch: >-
+  [{"op": "add","path": "/volumes/-","value": {"name":
+  "host-shared","hostpath": {"path":
+  "/nvmefs1/","type": "Directory"}}}, {"op":
+  "add","path": "/containers/0/volumeMounts/-","value": {"mountPath":
+  "/nvmefs1/","name": "host-shared"}}]

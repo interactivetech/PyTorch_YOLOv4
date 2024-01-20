@@ -13,7 +13,7 @@ spec:
       - echo starting;
         pip install streamlit watchdog;
         export TAKEOFF_DEVICE=cuda;
-        run app.py --server.runOnSave True --server.port 8051
+        streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app.py --server.runOnSave True --server.port 8051;
     ports:
     - containerPort: 8051
       hostPort: 8051
@@ -32,13 +32,11 @@ metadata:
     app: streamlit-np-pod-svc
   name: streamlit-np-pod-svc
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - nodePort: 32628
-    port: 8080
+    port: 8051
     protocol: TCP
-    targetPort: 8080
+    targetPort: 8051
   selector:
     name: streamlit-np-pod
-  sessionAffinity: None
-  type: LoadBalancer

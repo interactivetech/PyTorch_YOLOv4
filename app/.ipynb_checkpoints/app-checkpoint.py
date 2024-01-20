@@ -105,14 +105,14 @@ def plot_predictions(image_id, image_directory, annotations_json, threshold=0.3)
 def main():
     st.title("Object Detection Visualizer")
 
-    # json_data = load_json_data('/nvmefs1/andrew.mendez/fmv_full_preds/predictions.json')
-    json_data = load_json_data('/pfs/export/predictions.json')
+    json_data = load_json_data('/nvmefs1/andrew.mendez/fmv_full_preds/predictions.json')
+    # json_data = load_json_data('/pfs/export/predictions.json')
 
     unique_image_ids = list(extract_unique_image_ids(json_data))
 
     selected_id = st.slider("Select Image ID", min(unique_image_ids), max(unique_image_ids), unique_image_ids[0])
-    # image_directory = '/nvmefs1/andrew.mendez/fmv_vid/frames/'
-    image_directory = '/pfs/export/frames/'
+    image_directory = '/nvmefs1/andrew.mendez/fmv_vid/frames/'
+    # image_directory = '/pfs/export/frames/'
 
     try:
         image, counts = plot_predictions(selected_id, image_directory, json_data)

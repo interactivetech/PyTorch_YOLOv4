@@ -2,3 +2,4 @@ runs/
 weights/
 train.yaml
 export.yaml
+deploy.yaml

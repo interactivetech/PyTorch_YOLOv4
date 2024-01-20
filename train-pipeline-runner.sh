@@ -13,11 +13,13 @@ if [ $PNG_COUNT -gt 20 ]; then
     # If more than 20 .png files, run python -c "print(1)"
     echo "Running train-det-runner-full.py..."
     python /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/train-det-runner-full.py
+    echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt # Bash Command to ensure pachyderm sees a new output is completed, and doesnt skip
     echo "Done!"
 else
     # If 20 or fewer .png files, run python -c "print(0)"
     echo "Running train-det-runner-subset.py..."
     python /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/train-det-runner-subset.py
+    echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt # Bash Command to ensure pachyderm sees a new output is completed, and doesnt skip
     echo "Done!"
 fi
 

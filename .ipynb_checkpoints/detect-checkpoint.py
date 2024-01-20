@@ -20,7 +20,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 from models.models import *
 from utils.datasets import *
 from utils.general import *
-
+import json
 def load_classes(path):
     # Loads *.names file at 'path'
     with open(path, 'r') as f:
@@ -28,10 +28,12 @@ def load_classes(path):
     return list(filter(None, names))  # filter removes empty strings (such as last line)
 
 def detect(save_img=False):
-    out, source, weights, view_img, save_txt, imgsz, cfg, names = \
-        opt.output, opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, opt.cfg, opt.names
+    out, source, weights, view_img, save_txt, imgsz, cfg, names, save_json = \
+        opt.output, opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, opt.cfg, opt.names, opt.save_json
     webcam = source == '0' or source.startswith('rtsp') or source.startswith('http') or source.endswith('.txt')
-
+    if save_json==True:
+        print("Saving JSON") 
+    jdict = []# create list for coco detections
     # Initialize
     device = select_device(opt.device)
     if os.path.exists(out):
@@ -108,6 +110,7 @@ def detect(save_img=False):
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             if det is not None and len(det):
                 # Rescale boxes from img_size to im0 size
+                old_det = det.clone()
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 # Print results
@@ -128,13 +131,25 @@ def detect(save_img=False):
 
             # Print time (inference + NMS)
             print('%sDone. (%.3fs)' % (s, t2 - t1))
-
+            if save_json:
+                # [{"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}, ...
+                pathy = Path(p)
+                image_id = int(pathy.stem) if pathy.stem.isnumeric() else pathy.stem
+                box = old_det[:, :4].clone()  # xyxy
+                scale_coords(img.shape[2:], box, im0.shape).round()  # to original shape
+                boxy = xyxy2xywh(box)  # xywh
+                boxy[:, :2] -= boxy[:, 2:] / 2  # xy center to top-left corner
+                for p, b in zip(det.tolist(), boxy.tolist()):
+                    jdict.append({'image_id': image_id,
+                                  'category_id': int(p[5]),
+                                  'bbox': [round(x, 3) for x in b],
+                                  'score': round(p[4], 5)})
+                    # print(jdict[-1])
             # Stream results
             if view_img:
                 cv2.imshow(p, im0)
                 if cv2.waitKey(1) == ord('q'):  # q to quit
                     raise StopIteration
-
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'images':
@@ -151,13 +166,19 @@ def detect(save_img=False):
                         h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                         vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*fourcc), fps, (w, h))
                     vid_writer.write(im0)
-
+        
     if save_txt or save_img:
         print('Results saved to %s' % Path(out))
         if platform == 'darwin' and not opt.update:  # MacOS
             os.system('open ' + save_path)
-
+        # Save JSON
     print('Done. (%.3fs)' % (time.time() - t0))
+    
+    if save_json and len(jdict):
+        pred_json = str(Path(out) / "predictions.json")  # predictions json
+        print('saving %s...' % pred_json)
+        with open(pred_json, 'w') as f:
+            json.dump(jdict, f)
 
 
 if __name__ == '__main__':
@@ -177,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--update', action='store_true', help='update all models')
     parser.add_argument('--cfg', type=str, default='models/yolov4.cfg', help='*.cfg path')
     parser.add_argument('--names', type=str, default='data/coco.names', help='*.cfg path')
+    parser.add_argument('--save-json', action='store_true', help='save a cocoapi-compatible JSON results file')
     opt = parser.parse_args()
     print(opt)
 

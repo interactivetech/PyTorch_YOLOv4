@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: streamlit-np-pod
+  labels:
+    name: streamlit-np-pod
+spec:
+  containers:
+  - name: ubuntu
+    image: mendeza/yolov4-env:0.0.2
+    command: ["/bin/sh", "-c"]
+    args:
+      - echo starting;
+        pip install streamlit watchdog;
+        export TAKEOFF_DEVICE=cuda;
+        run app.py --server.runOnSave True --server.port 8051
+    ports:
+    - containerPort: 8051
+      hostPort: 8051
+    volumeMounts:
+    - name: host-volume
+      mountPath: /nvmefs1/
+  volumes:
+  - name: host-volume
+    hostPath:
+      path: /nvmefs1/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: streamlit-np-pod-svc
+  name: streamlit-np-pod-svc
+spec:
+  type: LoadBalancer
+  ports:
+  - nodePort: 32628
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    name: streamlit-np-pod
+  sessionAffinity: None
+  type: LoadBalancer

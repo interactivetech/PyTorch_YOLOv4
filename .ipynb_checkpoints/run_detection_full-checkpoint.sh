@@ -26,8 +26,9 @@ echo "Creating $OUTPUT_DIR/out/..."
 
 # Move all PNG and TXT files to the out/ directory
 mv $OUTPUT_DIR/*.png $OUTPUT_DIR/*.txt $OUTPUT_DIR/out/
-echo "Moved $OUTPUT_DIR/*.png OUTPUT_DIR/*.txt to $OUTPUT_DIR/out"
+echo "Moved $OUTPUT_DIR/*.png $OUTPUT_DIR/*.txt to $OUTPUT_DIR/out"
 
 # Step 3: Run FFMPEG to combine PNG files in the out/ directory into a video
 cd $OUTPUT_DIR
-ffmpeg -framerate 30 -pattern_type glob -i 'out/*.png' -c:v libx264 -pix_fmt yuv420p out/output_vid.mp4
+ffmpeg -framerate 30 -pattern_type glob -i 'out/*.png' -c:v libx264 -pix_fmt yuv420p $OUTPUT_DIR/out/output_vid.mp4
+echo "Created $OUTPUT_DIR/out/output_vid.mp4"

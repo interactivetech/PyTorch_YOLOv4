@@ -101,41 +101,158 @@ def plot_predictions(image_id, image_directory, annotations_json, threshold=0.3)
             draw.text((x, y), text, fill="yellow")
 
     return image, category_counts
+def get_paths(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        if len(lines) < 2:
+            return "File does not contain enough paths."
+
+        directory_path = lines[0].strip()  # First line for directory path
+        json_path = lines[1].strip()  # Second line for JSON file path
+
+        return directory_path, json_path
+def print_dict_items(dict_items):
+    # Convert dict_items to a dictionary if it's not already
+    if not isinstance(dict_items, dict):
+        dict_items = dict(dict_items)
+
+    # Check for the keys and prepare the print statement
+    vehicle_count = dict_items.get('vehicle', 0)
+    person_count = dict_items.get('person', 0)
+    print("vehicle_count: ",vehicle_count)
+    print("person_count: ",vehicle_count)
+    if vehicle_count and person_count:
+        st.write(f"There are {vehicle_count} vehicles and {person_count} person(s).")
+    elif vehicle_count:
+        st.write(f"There are {vehicle_count} vehicles.")
+    elif person_count:
+        st.write(f"There is {person_count} person(s).")
+    else:
+        print("There are no vehicles or persons.")
+            # st.table(df)
+            # print(counts.items())
+            # st.table(counts.items())
+                        
 
 def main():
-    st.title("Object Detection Visualizer")
 
-    json_data = load_json_data('/nvmefs1/andrew.mendez/fmv_full_preds/predictions.json')
+    st.title("Real-Time, Energy Efficient Full Motion Video (FMV) Analysis using IBM NorthPole and HPE MLOPs Platform")
+    st.markdown('''
+    This is a demo that showcases how IBM's NorthPole AI Accelerator and HPE's MLOPs Platform allows
+    real-time, low power AI powered FMV analysis at the edge. We use the NorthPole accelerator to process FMV video, 
+    and the HPE MLOPs platform for training, tuning, and deploying AI at Scale.
+    ''')
+
+    # video_file = open('/nvmefs1/andrew.mendez/fmv_full_preds/out/output_vid.mp4', 'rb')
+    # @st.cache_data
+    # def read_bytes(video_file):
+    #     video_bytes = video_file.read()
+    # video_bytes=read_bytes(video_file)
+    try:
+        import os
+        # directory_path, json_path = get_paths('/pfs/out/app_content.txt')
+        json_path = os.environ.get('PRED_JSON')
+        directory_path = os.environ.get('FRAMES_DIR')
+        vid_path = os.environ.get('VID_PATH')
+        print("directory_path, json_path vid_path: ", directory_path, json_path, vid_path )
+        
+        # print("Number of frames: ",os.listdir("/pfs/export/frames/"))
+    except Exception as e:
+        print(e)
+    
+    json_data = load_json_data(json_path)
     # json_data = load_json_data('/pfs/export/predictions.json')
 
     unique_image_ids = list(extract_unique_image_ids(json_data))
+    slider_id = st.slider("Select Image ID", min(unique_image_ids), max(unique_image_ids), unique_image_ids[0])
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("Processed Video")
+        st.video(vid_path)
 
-    selected_id = st.slider("Select Image ID", min(unique_image_ids), max(unique_image_ids), unique_image_ids[0])
-    image_directory = '/nvmefs1/andrew.mendez/fmv_vid/frames/'
+
+
+
     # image_directory = '/pfs/export/frames/'
 
-    try:
-        image, counts = plot_predictions(selected_id, image_directory, json_data)
-        st.image(image, caption=f"Image ID: {selected_id}", use_column_width=True)
+    with col2:
+        try:
+            image_directory = directory_path
+            image, counts = plot_predictions(slider_id, image_directory, json_data)
+            st.header("Individual Frames")
+            st.image(image, caption=f"Image ID: {slider_id}", use_column_width=True)
+            
 
-        # Displaying the counts as a table
-        st.subheader("Number of Targets Detected in Image")
-        print(counts.items())
-        data_dict = dict(counts.items())
-        print(data_dict)
-        # Create a DataFrame
-        df = pd.DataFrame([data_dict])
+    
+            # Displaying the counts as a table
+            st.subheader("Number of Targets Detected in Image")
+            print(counts.items())
+            data_dict = dict(counts.items())
+            print(data_dict)
+            # Create a DataFrame
+            df = pd.DataFrame([data_dict])
 
-        # Rename the columns
-        df.rename(columns={'vehicle': 'Vehicle(s)', 'person': 'Person(s)'}, inplace=True)
+            # Rename the columns
+            df.rename(columns={'vehicle': 'Vehicle(s)', 'person': 'Person(s)'}, inplace=True)
 
-        # Display the table in Streamlit
-        st.table(df)
-        # print(counts.items())
-        # st.table(counts.items())
+            # Display the table in Streamlit
 
-    except FileNotFoundError as e:
-        st.error(f"Error: {e}")
+            print_dict_items(data_dict)
 
+        except FileNotFoundError as e:
+            st.error(f"Error: {e}")
+    
+    st.header("MLOPS Pipeline managing End to End Pipeline")
+    full_screen_iframe = """
+    <style>
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Adjust the height as needed */
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    <div class="iframe-container">
+        <iframe src="http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/north-pole/pipelines/deploy/logs?prevPath=%2Flineage%2Fnorth-pole"></iframe>
+    </div>
+"""
+    st.write(
+        full_screen_iframe,
+        unsafe_allow_html=True,
+    )
+    st.header("Platform to manage resources and training for AI")
+    full_screen_iframe2 = """
+    <style>
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Adjust the height as needed */
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    <div class="iframe-container">
+        <iframe src="http://mlds-determined.us.rdlabs.hpecorp.net:8080/det/experiments/7045/overview"></iframe>
+    </div>
+"""
+    st.write(
+        full_screen_iframe2,
+        unsafe_allow_html=True,
+    )
 if __name__ == "__main__":
+    st.set_page_config(layout="wide")
     main()

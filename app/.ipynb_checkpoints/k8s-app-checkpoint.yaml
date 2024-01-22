@@ -12,7 +12,8 @@ spec:
     args:
       - echo starting;
         pip install streamlit watchdog;
-        export TAKEOFF_DEVICE=cuda;
+        export PRED_JSON=cuda;
+        export FRAMES_DIR=cuda;
         streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app.py --server.runOnSave True --server.port 8051;
     ports:
     - containerPort: 8051

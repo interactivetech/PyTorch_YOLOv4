@@ -21,6 +21,14 @@ def update_dummy_module():
     with open(dummy_path, "w") as fp:
         random_uuid_string = str(uuid.uuid4())
         fp.write(f'timestamp = "{dt.datetime.now()}-{random_uuid_string}"')
+        if 'update_list' not in st.session_state:
+            st.session_state.update_list = []
+
+        st.session_state.update_list.append(f"model deployed: {dt.datetime.now()}")
+
+        st.sidebar.write("Model Deployment Log:")
+        for update_message in st.session_state.update_list:
+            st.sidebar.write(update_message)
 
 @st.cache_resource
 def install_monitor():
@@ -298,9 +306,7 @@ def main():
     # )
     # Sidebar for tracking updates
     if 'update_list' not in st.session_state:
-        st.session_state.update_list = []
-
-    st.session_state.update_list.append(f"model deployed: {dt.datetime.now()}")
+                st.session_state.update_list = []
 
     st.sidebar.write("Model Deployment Log:")
     for update_message in st.session_state.update_list:

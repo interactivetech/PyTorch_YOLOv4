@@ -135,6 +135,7 @@ def print_dict_items(dict_items):
             # st.table(counts.items())
                         
 
+
 def main():
 
     st.title("Real-Time, Energy Efficient Full Motion Video (FMV) Analysis using IBM NorthPole and HPE MLOPs Platform")
@@ -221,7 +222,7 @@ def main():
         }
     </style>
     <div class="iframe-container">
-        <iframe src="http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/north-pole/pipelines/deploy/logs?prevPath=%2Flineage%2Fnorth-pole"></iframe>
+        <iframe src="http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/north-pole/"></iframe>
     </div>
 """
     st.write(
@@ -229,30 +230,36 @@ def main():
         unsafe_allow_html=True,
     )
     st.header("Platform to manage resources and training for AI")
-    full_screen_iframe2 = """
-    <style>
-        .iframe-container {
-            position: relative;
-            width: 100%;
-            height: 100vh; /* Adjust the height as needed */
-        }
-        .iframe-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
-    <div class="iframe-container">
-        <iframe src="http://mlds-determined.us.rdlabs.hpecorp.net:8080/det/experiments/7045/overview"></iframe>
-    </div>
-"""
-    st.write(
-        full_screen_iframe2,
-        unsafe_allow_html=True,
-    )
+    # Define the URL and the text to display
+    url = "http://mlds-determined.us.rdlabs.hpecorp.net:8080/det/experiments/7045/overview"
+    link_text = "http://mlds-determined.us.rdlabs.hpecorp.net:8080/det/experiments/7045/overview"
+
+    # Use Markdown to display the hyperlink
+    st.markdown(f"[{link_text}]({url})")
+#     full_screen_iframe2 = """
+#     <style>
+#         .iframe-container {
+#             position: relative;
+#             width: 100%;
+#             height: 100vh; /* Adjust the height as needed */
+#         }
+#         .iframe-container iframe {
+#             position: absolute;
+#             top: 0;
+#             left: 0;
+#             width: 100%;
+#             height: 100%;
+#             border: none;
+#         }
+#     </style>
+#     <div class="iframe-container">
+#         <iframe src="http://mlds-determined.us.rdlabs.hpecorp.net:8080/det/login"></iframe>
+#     </div>
+# """
+    # st.write(
+    #     full_screen_iframe2,
+    #     unsafe_allow_html=True,
+    # )
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
     main()

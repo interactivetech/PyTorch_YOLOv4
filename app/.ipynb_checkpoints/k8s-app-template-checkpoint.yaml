@@ -15,7 +15,7 @@ spec:
         export PRED_JSON={{PRED_JSON}};
         export FRAMES_DIR={{FRAMES_DIR}};
         export VID_PATH={{VID_PATH}};
-        streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app.py --server.runOnSave True --server.port 8051;
+        streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app-watch.py --server.runOnSave True --server.port 8051;
     ports:
     - containerPort: 8051
       hostPort: 8051

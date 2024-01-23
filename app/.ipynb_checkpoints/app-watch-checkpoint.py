@@ -1,9 +1,36 @@
+import datetime as dt
+import os
+import uuid
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 import streamlit as st
 import json
-import os
 from PIL import Image, ImageDraw
 from collections import Counter
 import pandas as pd
+
+class Watchdog(FileSystemEventHandler):
+    def __init__(self, hook):
+        self.hook = hook
+
+    def on_modified(self, event):
+        self.hook()
+
+def update_dummy_module():
+    dummy_path = '/nvmefs1/andrew.mendez/deployments_watcher_dummy.py'
+    with open(dummy_path, "w") as fp:
+        random_uuid_string = str(uuid.uuid4())
+        fp.write(f'timestamp = "{dt.datetime.now()}-{random_uuid_string}"')
+
+@st.cache_resource
+def install_monitor():
+    observer = Observer()
+    observer.schedule(Watchdog(update_dummy_module), path="/nvmefs1/andrew.mendez/deployments_watcher", recursive=False)
+    observer.start()
+
+def count_png_files(directory):
+    return len([name for name in os.listdir(directory) if name.endswith('.png')])
+
 def extract_unique_image_ids(json_data):
     """Extracts all unique image_ids from the json data."""
     return set([int(i['image_id']) for i in json_data])
@@ -133,11 +160,18 @@ def print_dict_items(dict_items):
             # st.table(df)
             # print(counts.items())
             # st.table(counts.items())
-                        
-
+def read_deployment_file(path):
+    with open(path, 'r') as file:
+        lines = file.readlines()
+        if len(lines) >= 3:
+            frame_dir, predictions_json, video_path = lines[:3]
+            frame_dir = frame_dir.strip()
+            predictions_json = predictions_json.strip()
+            video_path = video_path.strip()
+            return frame_dir, predictions_json, video_path                        
 
 def main():
-
+    install_monitor()
     st.title("Real-Time, Energy Efficient Full Motion Video (FMV) Analysis using IBM NorthPole and HPE MLOPs Platform")
     st.markdown('''
     This is a demo that showcases how IBM's NorthPole AI Accelerator and HPE's MLOPs Platform allows
@@ -156,6 +190,8 @@ def main():
         json_path = os.environ.get('PRED_JSON')
         directory_path = os.environ.get('FRAMES_DIR')
         vid_path = os.environ.get('VID_PATH')
+        directory_path, json_path, vid_path = read_deployment_file('/nvmefs1/andrew.mendez/deployments_watcher/app_content.txt')
+
         print("directory_path, json_path vid_path: ", directory_path, json_path, vid_path )
         
         # print("Number of frames: ",os.listdir("/pfs/export/frames/"))
@@ -260,6 +296,16 @@ def main():
     #     full_screen_iframe2,
     #     unsafe_allow_html=True,
     # )
+    # Sidebar for tracking updates
+    if 'update_list' not in st.session_state:
+        st.session_state.update_list = []
+
+    st.session_state.update_list.append(f"model deployed: {dt.datetime.now()}")
+
+    st.sidebar.write("Model Deployment Log:")
+    for update_message in st.session_state.update_list:
+        st.sidebar.write(update_message)
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
+    
     main()

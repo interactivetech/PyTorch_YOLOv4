@@ -17,7 +17,6 @@ spec:
         streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app.py --server.runOnSave True --server.port 8051;
     ports:
     - containerPort: 8051
-      hostPort: 8051
     volumeMounts:
     - name: host-volume
       mountPath: /nvmefs1/
@@ -41,3 +40,6 @@ spec:
     targetPort: 8051
   selector:
     name: streamlit-np-pod
+  sessionAffinity: None
+  type: LoadBalancer
+  loadBalancerIP: 10.182.1.52

@@ -15,10 +15,9 @@ spec:
         export PRED_JSON={{PRED_JSON}};
         export FRAMES_DIR={{FRAMES_DIR}};
         export VID_PATH={{VID_PATH}};
-        streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app-watch.py --server.runOnSave True --server.port 8051;
+        streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app-watch.py --server.runOnSave True --server.port 8080;
     ports:
-    - containerPort: 8051
-      hostPort: 8051
+    - containerPort: 8080
     volumeMounts:
     - name: host-volume
       mountPath: /nvmefs1/
@@ -34,11 +33,14 @@ metadata:
     app: streamlit-np-pod-svc
   name: streamlit-np-pod-svc
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-  - nodePort: 32628
-    port: 8051
+  - nodePort: 32629
+    port: 8080
     protocol: TCP
-    targetPort: 8051
+    targetPort: 8080
   selector:
     name: streamlit-np-pod
+  sessionAffinity: None
+  type: LoadBalancer
+  loadBalancerIP: 10.182.1.52

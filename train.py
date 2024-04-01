@@ -217,6 +217,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     model.names = names
 
     # Start training
+    epoch=0 
     t0 = time.time()
     nw = max(round(hyp['warmup_epochs'] * nb), 1000)  # number of warmup iterations, max(3 epochs, 1k iterations)
     # nw = min(nw, (epochs - start_epoch) / 2 * nb)  # limit warmup to < 1/2 of training

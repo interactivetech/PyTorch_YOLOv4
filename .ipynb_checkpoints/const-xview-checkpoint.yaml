@@ -1,0 +1,37 @@
+name: NorthPole Xview Finetuning Test
+workspace: Andrew
+project: NorthPole
+entrypoint: >-
+  python3 train-det.py 
+  --device 0 
+  --batch-size 8 
+  --epochs 304 
+  --img 1280 1280 
+  --data xview_37_nvmefs1.yaml 
+  --cfg cfg/yolov4-csp-leaky-xview37class.cfg
+  --weights '/nvmefs1/andrew.mendez/xview_37_dataset/best_pretrained.pt' 
+  --name /nvmefs1/andrew.mendez/yolov4_xview_train_runs/train_exp 
+  --exist-ok
+bind_mounts:
+  - container_path: /run/determined/coco
+    host_path: /home/andrew/coco
+  - container_path: /yolo
+    host_path: /home/andrew/PyTorch_YOLOv4
+  - container_path: /nvmefs1/
+    host_path: /nvmefs1/
+resources:
+  slots_per_trial: 1
+  resource_pool: T4
+environment:
+  image: mendeza/yolov4-env:0.0.2
+searcher:
+   name: single
+   metric: test_loss
+   max_length: 1
+   
+hyperparameters:
+   epochs: 1
+   batch_size: 128
+   test_batch_size: 128
+
+max_restarts: 0

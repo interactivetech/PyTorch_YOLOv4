@@ -238,7 +238,7 @@ def train(hyp,
                 'Starting training for %g epochs...' % (imgsz, imgsz_test, dataloader.num_workers, save_dir, epochs))
     
     torch.save(model, wdir / 'init.pt')
-    
+    epoch=start_epoch
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
 

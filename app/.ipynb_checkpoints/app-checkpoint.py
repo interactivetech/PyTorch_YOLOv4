@@ -138,11 +138,11 @@ def print_dict_items(dict_items):
 
 def main():
 
-    st.title("Real-Time, Energy Efficient Full Motion Video (FMV) Analysis using IBM NorthPole and HPE MLOPs Platform")
+    # st.title("Real-Time, Energy Efficient Full Motion Video (FMV) Analysis using IBM NorthPole and HPE MLOPs Platform")
+    st.title("End to End Full Motion Video (FMV) Detection using HPE MLOPs Platform at the Edge")
     st.markdown('''
-    This is a demo that showcases how IBM's NorthPole AI Accelerator and HPE's MLOPs Platform allows
-    real-time, low power AI powered FMV analysis at the edge. We use the NorthPole accelerator to process FMV video, 
-    and the HPE MLOPs platform for training, tuning, and deploying AI at Scale.
+    This is a demo that showcases how the HPE's MLOPs Platform allows continuous training an deployment of FMV analysis (Edge or Cloud). We use the NorthPole accelerator to process FMV video, 
+    and the HPE MLOPs platform for training, tuning, and deploying AI at Scale or at the Edge.
     ''')
 
     # video_file = open('/nvmefs1/andrew.mendez/fmv_full_preds/out/output_vid.mp4', 'rb')

@@ -30,14 +30,8 @@ searcher:
    max_length: 1
    
 hyperparameters:
-   epochs: 5
-   batch_size: 64
-   test_batch_size: 1000
-   learning_rate: 0.0001
-   gamma: 0.7
-   n_filters1: 8
-   n_filters2: 8
-   dropout1: 0.2
-   dropout2: 0.2
+   epochs: 1
+   batch_size: 128
+   test_batch_size: 128
 
 max_restarts: 0

@@ -217,6 +217,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     model.names = names
 
     # Start training
+    epoch=0 
     t0 = time.time()
     nw = max(round(hyp['warmup_epochs'] * nb), 1000)  # number of warmup iterations, max(3 epochs, 1k iterations)
     # nw = min(nw, (epochs - start_epoch) / 2 * nb)  # limit warmup to < 1/2 of training
@@ -302,6 +303,21 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
 
             # Print
             if rank in [-1, 0]:
+                # print("loss items: ",loss_items)
+                # Define the keys
+                keys = ['box', 'obj', 'cls', 'total']
+
+                # Convert tensor to dictionary
+                result_dict = dict(zip(keys, loss_items.cpu().numpy().tolist()))
+
+                # Print the resulting dictionary
+                # print(result_dict)
+                '''
+                core_context.train.report_training_metrics(
+                steps_completed=ni, 
+                metrics=result_dict
+                )
+                '''
                 mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
                 mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
                 s = ('%10s' * 2 + '%10.4g' * 6) % (
@@ -332,6 +348,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 ema.update_attr(model)
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
+                # Andrew(1.16.23) Why does this codebase do this?
                 if epoch >= 3:
                     results, maps, times = test.test(opt.data,
                                                  batch_size=batch_size*2,

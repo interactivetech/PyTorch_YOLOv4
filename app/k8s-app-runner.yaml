@@ -12,9 +12,9 @@ spec:
     args:
       - echo starting;
         pip install streamlit watchdog;
-        export PRED_JSON=/nvmefs1/andrew.mendez/fmv_full_preds/predictions.json;
+        export PRED_JSON=/nvmefs1/andrew.mendez/fmv_subset_preds/predictions.json;
         export FRAMES_DIR=/nvmefs1/andrew.mendez/fmv_vid/frames/;
-        export VID_PATH=/nvmefs1/andrew.mendez/fmv_full_preds/out/output_vid.mp4;
+        export VID_PATH=/nvmefs1/andrew.mendez/fmv_subset_preds/out/output_vid.mp4;
         streamlit run /nvmefs1/shared_nb/01\ -\ Users/andrew.mendez/2024/PyTorch_YOLOv4/app/app-watch.py --server.runOnSave True --server.port 8080;
     ports:
     - containerPort: 8080

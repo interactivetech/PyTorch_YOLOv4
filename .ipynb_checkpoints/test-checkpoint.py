@@ -117,7 +117,8 @@ def test(data,
         targets = targets.to(device)
         nb, _, height, width = img.shape  # batch size, channels, height, width
         whwh = torch.Tensor([width, height, width, height]).to(device)
-
+        print("whwh: ",whwh)
+        print("paths: ",paths)
         # Disable gradients
         with torch.no_grad():
             # Run model
